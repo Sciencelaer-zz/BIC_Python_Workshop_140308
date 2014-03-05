@@ -1,0 +1,113 @@
+{
+ "metadata": {
+  "name": "BIC - Make Subject Files"
+ },
+ "nbformat": 3,
+ "nbformat_minor": 0,
+ "worksheets": [
+  {
+   "cells": [
+    {
+     "cell_type": "heading",
+     "level": 1,
+     "metadata": {},
+     "source": "Making the individual subject files"
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Import the relevant libraries:"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "import itertools as it\nimport random as rand\nimport csv\nimport os",
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Open the relevant files (Note that 'w' creates a new file) :"
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Once these files are open, create a 'list' with all of the files"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "S0=open('Subject0.csv','w')\nS1=open('Subject1.csv','w')\nS2=open('Subject2.csv','w')\nS3=open('Subject3.csv','w')\nS4=open('Subject4.csv','w')\n\nfiles=[S0,S1,S2,S3,S4]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 43
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Create the relevant lists:"
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Note that in this case, we are using lists of lists. It's the laziest possible way of organizing data into something that resembles a matrix."
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "Trials=[[],[],[],[],[]]\nRTs=[[],[],[],[],[]]\nResponses=[[],[],[],[],[]]\nSubjects=[[],[],[],[],[]]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 40
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Fill those lists of lists with what you want:"
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Iterators are the python feature I am most proud to understand. I couldn't figure out how to use an iterator for the last one, so I just nested a loop. In fact, all of these can be done with nested loops. I just really really like iterators...\n\nMy lists for this example are being filled with random numbers. If you wanted to, you could read in information from your files and fill the lists with actual data! "
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "for i,j in it.product(range(5),it.chain.from_iterable(it.repeat('hsn',100))):\n            Trials[i].append(j)\n\nfor i,j in it.product(range(5),it.chain.from_iterable(it.repeat('hs',150))):\n            Responses[i].append(j)\n\nfor i,j in it.product(range(5),range(300)):\n            RTs[i].append(rand.random())\n        \nfor i in range(5):\n    for j in it.izip(Trials[i],RTs[i],Responses[i]):\n        Subjects[i].append(j)",
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Write your lists of lists to files:"
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "I've added a header to the start of each file. You also have to CLOSE each file in order for things to show up there. "
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "for f in enumerate(files):\n    writer=csv.writer(f[1])\n    writer.writerow(('Trial','RT','Response'))\n    writer.writerows(Subjects[f[0]])\n    \n    f[1].close()",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 44
+    }
+   ],
+   "metadata": {}
+  }
+ ]
+}
