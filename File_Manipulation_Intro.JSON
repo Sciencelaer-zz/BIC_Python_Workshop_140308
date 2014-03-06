@@ -1,0 +1,531 @@
+{
+ "metadata": {
+  "name": "BIC - Working with files"
+ },
+ "nbformat": 3,
+ "nbformat_minor": 0,
+ "worksheets": [
+  {
+   "cells": [
+    {
+     "cell_type": "heading",
+     "level": 1,
+     "metadata": {},
+     "source": "Brute forcing it"
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "This is not the best way to do this. This is not the fastest way to do this. This is, however, the way that requires you to remember the least number of commands. The reason this is useful, is that it allows you to write scripts even when you're not connected to the internet. \n\nThe second reason this is good practice, is that it keeps you honest. Sure, someone has written a library that looks like it does exactly what you want...but do you really understand it? Could you explain it to someone who is trying to reproduce your results? If something stops working, will you be able to find the bug?"
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Open a file for reading, and read in it's contents"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "import scipy \nfrom scipy import *",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 62
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "ls *.csv",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "Subject0.csv  Subject1.csv  Subject2.csv  Subject3.csv  Subject4.csv\r\n"
+      }
+     ],
+     "prompt_number": 4
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "sub0=open('Subject0.csv','r')",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 6
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "sub0 is now open for reading. If we wanted to append to the file, we would have put 'a' instead of 'r'. IMPORTANT: 'w' will OVERWRITE the existing file and create an empty one in its place.\n\nFor now, we want to read in ALL the lines in Subject0.csv"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "allLines=sub0.readlines()",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 7
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "You should (generally speaking) close files once you're done using them. Since we're not writing anything to this file and, in fact, really want to avoid writing to it, we can close it as soon as we've read all the lines into a variable."
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "sub0.close()",
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "allLines now contains a list of the lines in 'Subject0.csv'\n\nEach list entry contains a single line of the file as a continuous (unparsed) string. These strings are indexed starting at 0, and can be accessed from the list using square brackets. Note that starting at 0 means you end at length - 1. In python you can access the last element with allLines[len(allLines-1)] OR you can just do allLines[-1]. You can count backwards from the end using negative numbers :-)"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "allLines[0]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 9,
+       "text": "'Trial,RT,Response\\r\\n'"
+      }
+     ],
+     "prompt_number": 9
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "allLines[-1]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 20,
+       "text": "'n,0.7115071264474393,s'"
+      }
+     ],
+     "prompt_number": 20
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "allLines[len(allLines)-1]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 21,
+       "text": "'n,0.7115071264474393,s'"
+      }
+     ],
+     "prompt_number": 21
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Format the lines into something useful"
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "You'll notice that each line has the following charachter at the end '\\r\\n'. This tells the computer that it is the end of a line. This is useful for writing/reading from files, but not useful for accessing the data. Let's get rid of it using the 'rstrip' command. "
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "for line in allLines:\n    line = line.rstrip('\\r\\n')",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 16
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "This type of loop can be written in single line format as well. Ah the beauty of python"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "allLines=[line.rstrip('\\r\\n') for line in allLines] ",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 14
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "allLines[0]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 18,
+       "text": "'Trial,RT,Response'"
+      }
+     ],
+     "prompt_number": 18
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "allLines[1]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 19,
+       "text": "'h,0.5529500872997785,h'"
+      }
+     ],
+     "prompt_number": 19
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Now you've gotten rid of the trailing characters, but you still have a continuous line of text. What we want is to turn this list into a list of lists. \n\nIn order to do this, we are going to use the 'split' command. This command takes 1 argument, which is the delimeter you used in your csv file. It doesn't necessarily have to be a ','"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "example='hello world how are you'\nexample=example.split(' ')\nprint example",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "['hello', 'world', 'how', 'are', 'you']\n"
+      }
+     ],
+     "prompt_number": 30
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "Now we do this for allLines. Note that you need to have allLines on the left hand side of the equal operator",
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "allLines=[line.split(',') for line in allLines]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 23
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "allLines[0]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 24,
+       "text": "['Trial', 'RT', 'Response']"
+      }
+     ],
+     "prompt_number": 24
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "We finally have a 'minimalist' version of a matrix! All in all, this is what we've done:"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "sub0=open('Subject0.csv','r')\nallLines=sub0.readlines()\nsub0.close()\n\nallLines=[line.rstrip('\\r\\n') for line in allLines] \nallLines=[line.split(',') for line in allLines]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 6
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Since this is something we will have to do to all of the files, let's save it as a function."
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Create a function "
+    },
+    {
+     "cell_type": "raw",
+     "metadata": {},
+     "source": "functions are created using the following syntax:\n\ndef functionName(things that the function needs):\n    \n    thing 1 the function does\n    thing 2 the function does\n\n    return thingThatIsDifferent"
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "In this case, we want a function that formats text. So let's call our function 'format' have it read a file, and have it return the pseudo-matrix we want."
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "def formatSubjectFile(inputFileName):\n    \n    f=open(inputFileName,'r')\n    allLines=f.readlines()\n    f.close()\n    \n    allLines=[line.rstrip('\\r\\n') for line in allLines] \n    allLines=[line.split(',') for line in allLines]\n    \n    return allLines\n    ",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 47
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "We now have a function that we can use! Let's see how that works."
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s0_formatted=formatSubjectFile('Subject0.csv')\ns1_formatted=formatSubjectFile('Subject1.csv')",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 48
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Now without actually doing any extra work, we were able to format the file for Subject 1"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s1_formatted[0]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 44,
+       "text": "['Trial', 'RT', 'Response']"
+      }
+     ],
+     "prompt_number": 44
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Great! Lets write this to a file. Writing things to a file just means that you will be able to import them into other sessions. \n\nMoving on, let's try to extract useful information from this psuedo matrix. What do we do if we want the column average of the Reaction Times? "
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Creating columns out of thin air"
+    },
+    {
+     "cell_type": "heading",
+     "level": 4,
+     "metadata": {},
+     "source": "There are much (much) better ways of doing this. Those ways use a library called Pandas. We won't be talking about Pandas today. Today we do things the hard way. "
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Say we don't remember which column is which, but we know that we have a header with labels. Let's try to use that. "
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s0_formatted[0]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 49,
+       "text": "['Trial', 'RT', 'Response']"
+      }
+     ],
+     "prompt_number": 49
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "So we know that reaction time is at index 1 (remember that python arrays start numbering at 0!).\n\nIf we remember the value of what we want to find, in this case 'RT', we can use a built in function called 'index' to find it. "
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s0_formatted[0].index('RT')",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 52,
+       "text": "1"
+      }
+     ],
+     "prompt_number": 52
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Alright. What can we do with that? All the reaction times are in that column.\n\nThis is where lists are a bit tricky compared to actual matrices -- we don't have columns. But never fear!"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s0_RT=[thing[1] for thing in s0_formatted]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 84
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s0_RT[0:10]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 55,
+       "text": "['RT',\n '0.5529500872997785',\n '0.6657745702798641',\n '0.8645951689109606',\n '0.22333795877074902',\n '0.20237797825823733',\n '0.20549741635203833',\n '0.7740688807147481',\n '0.1424224328317687',\n '0.07278165762560462']"
+      }
+     ],
+     "prompt_number": 55
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Alas, that still leaves the 'RT'. We can't have that in our mean! And our numbers are still 'strings.' We need actual numbers. First lets add a \"getColum\" function to our library and have it automatically remove the column header. "
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "def getColumn(pseudoMatrix,columnHeader):\n\n\tindex=pseudoMatrix[0].index(columnHeader)\n\tcolumn=[row[index] for row in pseudoMatrix]\n\n\treturn column[1:-1]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 87
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s0_RT=getColumn(s0_formatted,'RT')",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 88
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s0_RT=[float(number) for number in s0_RT]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 91
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "again, lets add this to the library"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "def makeNumbers(someString):\n    someNumbers=[float(eachString) for eachString in someString]\n    \n    return someNumbers",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 92
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "perfect. we can now do all kinds of operations on this 'column'."
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "mean(s0_RT)",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 68,
+       "text": "0.50253066206270003"
+      }
+     ],
+     "prompt_number": 68
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "min(s0_RT)",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 69,
+       "text": "0.004357117398495092"
+      }
+     ],
+     "prompt_number": 69
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "std(s0_RT)",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 70,
+       "text": "0.28249422908436805"
+      }
+     ],
+     "prompt_number": 70
+    },
+    {
+     "cell_type": "heading",
+     "level": 3,
+     "metadata": {},
+     "source": "Turning columns into something useful"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "",
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    }
+   ],
+   "metadata": {}
+  }
+ ]
+}
