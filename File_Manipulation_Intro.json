@@ -58,6 +58,14 @@
      "prompt_number": 6
     },
     {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "",
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    },
+    {
      "cell_type": "markdown",
      "metadata": {},
      "source": "sub0 is now open for reading. If we wanted to append to the file, we would have put 'a' instead of 'r'. IMPORTANT: 'w' will OVERWRITE the existing file and create an empty one in its place.\n\nFor now, we want to read in ALL the lines in Subject0.csv"
@@ -435,7 +443,7 @@
      "language": "python",
      "metadata": {},
      "outputs": [],
-     "prompt_number": 88
+     "prompt_number": 95
     },
     {
      "cell_type": "code",
@@ -444,7 +452,7 @@
      "language": "python",
      "metadata": {},
      "outputs": [],
-     "prompt_number": 91
+     "prompt_number": 96
     },
     {
      "cell_type": "markdown",
@@ -515,6 +523,210 @@
      "level": 3,
      "metadata": {},
      "source": "Turning columns into something useful"
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Very rarely do we just care about one factor at a time in science. In this case, let's say see how many times Subject 1 rated happy faces as happy and sad faces as sad. For that we need to know a few pieces of information. 1. How many total instances of \"Happy\" were presented 2. How many instances of \"Sad\" were presented 3. How many Happy-Happy pairs and Sad-Sad pairs. "
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s0_Trials=getColumn(s0_formatted,'Trial')\ns0_Responses=getColumn(s0_formatted,'Response')",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 94
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "Happy_Trials=[index for index,condition in enumerate(s0_Trials) if condition == 'h']\nSad_Trials=[index for index,condition in enumerate(s0_Trials) if condition == 's']\nNeutral_Trial=[index for index,condition in enumerate(s0_Trials) if condition == 'n']\n\nHappy_Responses=[index for index,condition in enumerate(s0_Responses) if condition == 'h']\nSad_Responses=[index for index,condition in enumerate(s0_Responses) if condition == 's']\nNeutral_Responses=[index for index,condition in enumerate(s0_Responses) if condition == 'n']",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 113
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "hm... we seem to be doing that alot. Let's turn it into a function!"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "def findTrialType(allTrials,allResponses,trialType):\n    \n    trials_of_trialType=[index for index,condition in enumerate(allTrials) if condition == trialType]\n    responses_of_trialType=[index for index,condition in enumerate(allResponses) if condition == trialType]\n    \n    return trials_of_trialType,responses_of_trialType",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 117
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "[Happy_Trials,Happy_Responses] = findTrialType(s0_Trials,s0_Responses,'h')\n[Sad_Trials,Sad_Responses] = findTrialType(s0_Trials,s0_Responses,'s')\n[Neutral_Trials,Neutral_Responses] = findTrialType(s0_Trials,s0_Responses,'n')",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 118
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "Great, so now we can see what they got correct. "
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "Happy_Correct=[trial for trial in Happy_Trials if trial in Happy_Responses]\nSad_Correct=[trial for trial in Sad_Trials if trial in Sad_Responses]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 122
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "print float(len(Happy_Correct))/float(len(Happy_Trials))\nprint float(len(Sad_Correct))/float(len(Sad_Trials))",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "0.5\n0.5\n"
+      }
+     ],
+     "prompt_number": 127
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "For good measure, let's save that as a function"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "def percentMatch(Trials,Responses):\n    \n    match=[trial for trial in Trials if trial in Responses]\n    percent=100*float(len(match))/float(len(Trials))\n    \n    return percent",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 132
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "We can now look at percent matches for other things"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "sad_for_happy=percentMatch(Happy_Trials,Sad_Responses)\nprint sad_for_happy",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "50.0\n"
+      }
+     ],
+     "prompt_number": 134
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "happy_for_neutral=percentMatch(Neutral_Trials,Happy_Responses)\nprint happy_for_neutral",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "50.5050505051\n"
+      }
+     ],
+     "prompt_number": 135
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "sad_for_neutral=percentMatch(Neutral_Trials,Sad_Responses)\nprint sad_for_neutral",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "49.4949494949\n"
+      }
+     ],
+     "prompt_number": 137
+    },
+    {
+     "cell_type": "markdown",
+     "metadata": {},
+     "source": "We can also apply the same method to find only trials above or below a certain reaction time. "
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "Happy_Quick = [trial for trial in Happy_Correct if s0_RT[trial] < mean(s0_RT)]\nprint Happy_Quick\n\nHappy_Quick = [trial for trial in Happy_Correct if s0_RT[trial] < mean(s0_RT)]",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "[18, 42, 48, 54, 66, 72, 84, 90, 96, 102, 108, 114, 150, 162, 174, 180, 186, 198, 222, 228, 234, 246, 264, 276, 282, 288, 294]\n"
+      }
+     ],
+     "prompt_number": 141
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "mean_Happy_Quick = mean([s0_RT[rt] for rt in Happy_Quick]) \nprint mean_Happy_Quick",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": "0.274168220676\n"
+      }
+     ],
+     "prompt_number": 142
+    },
+    {
+     "cell_type": "heading",
+     "level": 1,
+     "metadata": {},
+     "source": "Pythoning it"
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "import pandas as pd\nfrom pandas import *\n\ns0=read_csv('Subject0.csv')",
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 145
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": "s0['Trial']",
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "pyout",
+       "prompt_number": 147,
+       "text": "0     h\n1     s\n2     n\n3     h\n4     s\n5     n\n6     h\n7     s\n8     n\n9     h\n10    s\n11    n\n12    h\n13    s\n14    n\n...\n285    h\n286    s\n287    n\n288    h\n289    s\n290    n\n291    h\n292    s\n293    n\n294    h\n295    s\n296    n\n297    h\n298    s\n299    n\nName: Trial, Length: 300, dtype: object"
+      }
+     ],
+     "prompt_number": 147
     },
     {
      "cell_type": "code",
